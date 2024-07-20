@@ -7,7 +7,7 @@
     "icon": "115",
     "author": "yantao",
     "homepage": "https://yantao.wiki",
-    "appcast": "https://raw.githubusercontent.com/almightyYantao/bob-plugin-deeplx-translator/main/src/appcast.json",
+    "appcast": "https://raw.githubusercontent.com/almightyYantao/bob-plugin-deeplx-translator/main/appcast.json",
     "minBobVersion": "0.5.0",
     "options": [
         {

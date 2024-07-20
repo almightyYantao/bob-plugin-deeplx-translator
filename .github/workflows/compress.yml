@@ -95,7 +95,7 @@ jobs:
                   "sha256": "${{ steps.sha256.outputs.sha256 }}",
                   "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/${{ steps.next_version.outputs.next_version }}/${{ steps.build.outputs.build }}.bobplugin",
                   "minBobVersion": "0.5.0",
-                  "timestamp": "${{ steps.timestamp.outputs.timestamp }}"
+                  "timestamp": ${{ steps.timestamp.outputs.timestamp }}
                 }'
 
         # Read the current appcast.json
