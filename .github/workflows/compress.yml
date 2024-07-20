@@ -6,7 +6,7 @@ on:
       - main
     # Ignore the push event if commit message contains "[skip ci]"
     paths-ignore:
-      - 'src/appcast.json'
+      - 'appcast.json'
 
 jobs:
   zip:
@@ -28,7 +28,8 @@ jobs:
 
     - name: Zip src directory
       run: |
-        zip -r src.zip src
+        cd src && zip -r src.zip . -x ".*" -x "*/.*" -x "*/*/.*" -x "*/*/*/.*" -x "src.zip"
+        mv src.zip ../
       working-directory: ${{ github.workspace }}
 
     - name: Calculate SHA256
@@ -39,13 +40,13 @@ jobs:
     - name: Read appcast.json
       id: read_appcast
       run: |
-        echo ::set-output name=appcast::$(cat src/appcast.json)
+        echo ::set-output name=appcast::$(cat appcast.json)
       working-directory: ${{ github.workspace }}
 
     - name: Determine next version
       id: next_version
       run: |
-        versions=$(jq '.versions[].version' src/appcast.json)
+        versions=$(jq '.versions[].version' appcast.json)
         if [ -z "$versions" ]; then
             versions="0.0.0"
         fi
@@ -70,6 +71,15 @@ jobs:
         new_version="$major.$minor.$patch"
 
         echo "::set-output name=next_version::$new_version"
+      shell: bash
+      working-directory: ${{ github.workspace }}
+    
+    - name: Get Info.json Version
+      id: get_info_version
+      run: |
+        version=$(jq -r '.version' src/info.json)
+        echo "Version: $version"
+        echo "::set-output name=version::$version"
       shell: bash
       working-directory: ${{ github.workspace }}
 
@@ -99,13 +109,18 @@ jobs:
                 }'
 
         # Read the current appcast.json
-        current_appcast=$(cat src/appcast.json)
+        current_appcast=$(cat appcast.json)
 
         # Append the new version object to the versions array
         new_appcast=$(jq --argjson new_version "$new_version" '.versions += [$new_version]' <<< "$current_appcast")
 
         # Update appcast.json with the new versions array
-        echo "$new_appcast" > src/appcast.json
+        echo "$new_appcast" > appcast.json
+      working-directory: ${{ github.workspace }}
+    
+    - name: Modify src/info.json
+      run: |
+        jq --arg new_version "${{ steps.next_version.outputs.next_version }}" '.version = $new_version' src/info.json > tmp.$$.json && mv tmp.$$.json src/info.json
       working-directory: ${{ github.workspace }}
         
     - name: Create Release
@@ -114,7 +129,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
-        tag_name: v${{ github.run_number }}
+        tag_name: ${{ steps.next_version.outputs.next_version }}
         release_name: ${{ steps.build.outputs.build }}.bobplugin ${{ steps.next_version.outputs.next_version }}
         body: |
           - Added ${{ steps.build.outputs.build }}.bobplugin

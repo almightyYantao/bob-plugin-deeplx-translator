@@ -1,58 +1,58 @@
 {
-    "identifier": "yantao.deeplx.bob",
-    "version": "0.1.1",
-    "category": "translate",
-    "name": "DeepLx 翻译插件",
-    "summary": "DeepLx 翻译插件",
-    "icon": "115",
-    "author": "yantao",
-    "homepage": "https://yantao.wiki",
-    "appcast": "https://raw.githubusercontent.com/almightyYantao/bob-plugin-deeplx-translator/main/appcast.json",
-    "minBobVersion": "0.5.0",
-    "options": [
+  "identifier": "yantao.deeplx.bob",
+  "version": "0.0.2",
+  "category": "translate",
+  "name": "DeepLx 翻译插件",
+  "summary": "DeepLx 翻译插件",
+  "icon": "115",
+  "author": "yantao",
+  "homepage": "https://yantao.wiki",
+  "appcast": "https://raw.githubusercontent.com/almightyYantao/bob-plugin-deeplx-translator/main/appcast.json",
+  "minBobVersion": "0.5.0",
+  "options": [
+    {
+      "identifier": "key",
+      "type": "text",
+      "desc": "申请地址：https://linux.do/t/topic/111737",
+      "title": "Key"
+    },
+    {
+      "identifier": "apiMenu",
+      "type": "menu",
+      "title": "API类型",
+      "defaultValue": "1",
+      "menuValues": [
         {
-            "identifier": "key",
-            "type": "text",
-            "desc": "申请地址：https://linux.do/t/topic/111737",
-            "title": "Key"
+          "title": "内置API-Linux.Do",
+          "value": "1"
         },
         {
-            "identifier": "apiMenu",
-            "type": "menu",
-            "title": "API类型",
-            "defaultValue": "1",
-            "menuValues": [
-                {
-                    "title": "内置API-Linux.Do",
-                    "value": "1"
-                },
-                {
-                    "title": "自定义API",
-                    "value": "2"
-                }
-            ]
-        },
-        {
-            "identifier": "customUrl",
-            "type": "text",
-            "title": "自定义API地址",
-            "desc": "请填写完成的地址：https://api.deeplx.org/key/translate\n需要带上Key，否则的话将失效"
-        },
-        {
-            "identifier": "alternatives",
-            "type": "menu",
-            "title": "是否启用Alternatives",
-            "defaultValue": "1",
-            "menuValues": [
-                {
-                    "title": "启用",
-                    "value": "1"
-                },
-                {
-                    "title": "禁用",
-                    "value": "2"
-                }
-            ]
+          "title": "自定义API",
+          "value": "2"
         }
-    ]
+      ]
+    },
+    {
+      "identifier": "customUrl",
+      "type": "text",
+      "title": "自定义API地址",
+      "desc": "请填写完成的地址：https://api.deeplx.org/key/translate\n需要带上Key，否则的话将失效"
+    },
+    {
+      "identifier": "alternatives",
+      "type": "menu",
+      "title": "是否启用Alternatives",
+      "defaultValue": "1",
+      "menuValues": [
+        {
+          "title": "启用",
+          "value": "1"
+        },
+        {
+          "title": "禁用",
+          "value": "2"
+        }
+      ]
+    }
+  ]
 }
