@@ -1,14 +1,21 @@
 {
-    "identifier": "yantao.deeplx.bob",
-    "versions": [
-      {
-        "version": "0.0.1",
-        "desc": "Combine all commits into one",
-        "sha256": "9ce865b76071ecc07c98c6b71de1726d785ad90d7c957aedc7e4f30c37d0e2c0",
-        "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/0.0.1/bob-plugin-deeplx-translator.bobplugin",
-        "minBobVersion": "0.5.0",
-        "timestamp": "1721436798631"
-      }
-    ]
-  }
-  
+  "identifier": "yantao.deeplx.bob",
+  "versions": [
+    {
+      "version": "0.0.1",
+      "desc": "Combine all commits into one",
+      "sha256": "9ce865b76071ecc07c98c6b71de1726d785ad90d7c957aedc7e4f30c37d0e2c0",
+      "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/0.0.1/bob-plugin-deeplx-translator.bobplugin",
+      "minBobVersion": "0.5.0",
+      "timestamp": "1721436798631"
+    },
+    {
+      "version": "0.0.2",
+      "desc": "Update appcast path",
+      "sha256": "8188d2a2e09beee1372c8c8dc52fffdd01b3db4b98ce73d75a030eb3002abe9d",
+      "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/0.0.2/bob-plugin-deeplx-translator.bobplugin",
+      "minBobVersion": "0.5.0",
+      "timestamp": 1721466361810
+    }
+  ]
+}
