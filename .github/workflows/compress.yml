@@ -1,0 +1,149 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+    # Ignore the push event if commit message contains "[skip ci]"
+    paths-ignore:
+      - 'src/appcast.json'
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Get repository name
+      id: build
+      run: echo "::set-output name=build::$(basename $(pwd))"
+      shell: bash
+
+    - name: Zip src directory
+      run: |
+        zip -r src.zip src
+      working-directory: ${{ github.workspace }}
+
+    - name: Calculate SHA256
+      id: sha256
+      run: echo "::set-output name=sha256::$(sha256sum src.zip | awk '{print $1}')"
+      working-directory: ${{ github.workspace }}
+
+    - name: Read appcast.json
+      id: read_appcast
+      run: |
+        echo ::set-output name=appcast::$(cat src/appcast.json)
+      working-directory: ${{ github.workspace }}
+
+    - name: Determine next version
+      id: next_version
+      run: |
+        versions=$(jq '.versions[].version' src/appcast.json)
+        max_version=$(echo "$versions" | sort -rV | head -n1)
+        max_version=$(echo "$max_version" | sed 's/"//g')
+        # 分割版本号为主、次、修订三个部分
+        IFS='.' read -r -a version_parts <<< "$max_version"
+        major="${version_parts[0]}"
+        minor="${version_parts[1]}"
+        patch="${version_parts[2]}"
+
+        # 增加修订版本号
+        patch=$((patch + 1))
+
+        # 如果修订版本号超过9，则次版本号加一，并将修订版本号重置为0
+        if [ "$patch" -gt 9 ]; then
+          minor=$((minor + 1))
+          patch=0
+        fi
+
+        # 拼接新版本号
+        new_version="$major.$minor.$patch"
+
+        echo "::set-output name=next_version::$new_version"
+      shell: bash
+      working-directory: ${{ github.workspace }}
+
+    - name: Get commit message
+      id: commit_message
+      run: echo "::set-output name=message::$(git log -1 --pretty=%B)"
+      shell: bash
+
+    - name: Rename zip file
+      run: mv src.zip ${{ steps.build.outputs.build }}.bobplugin
+      working-directory: ${{ github.workspace }}
+
+    - name: Get current timestamp
+      id: timestamp
+      run: echo "::set-output name=timestamp::$(date +%s)"
+    
+    - name: Modify appcast.json
+      run: |
+        # Generate the new version object to add
+        new_version='{
+                  "version": "${{ steps.next_version.outputs.next_version }}",
+                  "desc": "${{ steps.commit_message.outputs.message }}",
+                  "sha256": "${{ steps.sha256.outputs.sha256 }}",
+                  "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/${{ steps.next_version.outputs.next_version }}/${{ steps.build.outputs.build }}.bobplugin",
+                  "minBobVersion": "0.5.0",
+                  "timestamp": "${{ steps.timestamp.outputs.timestamp }}"
+                }'
+
+        # Read the current appcast.json
+        current_appcast=$(cat src/appcast.json)
+
+        # Append the new version object to the versions array
+        new_appcast=$(jq --argjson new_version "$new_version" '.versions += [$new_version]' <<< "$current_appcast")
+
+        # Update appcast.json with the new versions array
+        echo "$new_appcast" > src/appcast.json
+      working-directory: ${{ github.workspace }}
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        body: |
+          - Added ${{ steps.build.outputs.build }}.bobplugin
+          - SHA256: ${{ steps.sha256.outputs.sha256 }}
+          - Version: {
+                  "version": "${{ steps.next_version.outputs.next_version }}",
+                  "desc": "${{ steps.commit_message.outputs.message }}",
+                  "sha256": "${{ steps.sha256.outputs.sha256 }}",
+                  "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/${{ steps.next_version.outputs.next_version }}/${{ steps.build.outputs.build }}.bobplugin",
+                  "minBobVersion": "0.5.0",
+                  "timestamp": "${{ steps.timestamp.outputs.timestamp }}"
+                }
+          - 将上面的内容更新到appcast.json即可
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ steps.build.outputs.build }}.bobplugin
+        asset_name: ${{ steps.build.outputs.build }}.bobplugin
+        asset_content_type: application/zip
+      
+    # - uses: actions/checkout@v2
+    - name: Auto commit
+      uses: stefanzweifel/git-auto-commit-action@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      with:
+        commit_message: " Automated commit by GitHub Action"
+        branch: ${{ github.ref }}  

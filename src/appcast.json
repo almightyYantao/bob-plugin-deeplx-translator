@@ -1,0 +1,21 @@
+{
+    "identifier": "yantao.deeplx.bob",
+    "versions": [
+        {
+            "version": "0.1.1",
+            "desc": "支持更多的语言、支持自定义alternatives等",
+            "sha256": "4720b3e778814b8a7c520e78c09b795a7f7cbfaf8280a39586d22ab4a4a3243f",
+            "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/0.1.1/yantao.deeplx.bob.bobplugin",
+            "minBobVersion": "0.5.0",
+            "timestamp": 1721375800335
+        },
+        {
+            "version": "0.1.0",
+            "desc": "初始版本",
+            "sha256": "de2971f1413ee4c8fc77005b8790a54b176e406f822b78f28a967033190a5f91",
+            "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/0.1.0/bob-plugin-deeplx-translator.bobplugin",
+            "minBobVersion": "0.5.0",
+            "timestamp": 1721289434000
+        }
+    ]
+}
