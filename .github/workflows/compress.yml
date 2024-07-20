@@ -46,6 +46,9 @@ jobs:
       id: next_version
       run: |
         versions=$(jq '.versions[].version' src/appcast.json)
+        if [ -z "$versions" ]; then
+            versions="0.0.0"
+        fi
         max_version=$(echo "$versions" | sort -rV | head -n1)
         max_version=$(echo "$max_version" | sed 's/"//g')
         # 分割版本号为主、次、修订三个部分
@@ -81,7 +84,7 @@ jobs:
 
     - name: Get current timestamp
       id: timestamp
-      run: echo "::set-output name=timestamp::$(date +%s)"
+      run: echo "::set-output name=timestamp::$(date +%s%3N)"
     
     - name: Modify appcast.json
       run: |
@@ -112,7 +115,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
         tag_name: v${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
+        release_name: ${{ steps.build.outputs.build }}.bobplugin ${{ steps.next_version.outputs.next_version }}
         body: |
           - Added ${{ steps.build.outputs.build }}.bobplugin
           - SHA256: ${{ steps.sha256.outputs.sha256 }}
@@ -122,9 +125,8 @@ jobs:
                   "sha256": "${{ steps.sha256.outputs.sha256 }}",
                   "url": "https://github.com/almightyYantao/bob-plugin-deeplx-translator/releases/download/${{ steps.next_version.outputs.next_version }}/${{ steps.build.outputs.build }}.bobplugin",
                   "minBobVersion": "0.5.0",
-                  "timestamp": "${{ steps.timestamp.outputs.timestamp }}"
+                  "timestamp": ${{ steps.timestamp.outputs.timestamp }}
                 }
-          - 将上面的内容更新到appcast.json即可
         draft: false
         prerelease: false
 
